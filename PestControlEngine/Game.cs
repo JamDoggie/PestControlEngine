@@ -1,21 +1,34 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
+using PestControlAnimation.Objects;
+using PestControlEngine.Graphics;
+using PestControlEngine.Objects;
+using PestControlEngine.Resource;
+using System;
+using System.IO;
 
-namespace PestControl
+namespace PestControlEngine
 {
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Game
+    public class Game : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        
-        public Game1()
+        ObjectManager objManager;
+        public Game()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            IsMouseVisible = true;
+
+            Window.AllowUserResizing = true;
+
+            objManager = new ObjectManager();
         }
 
         /// <summary>
@@ -26,7 +39,14 @@ namespace PestControl
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            ContentLoader.LoadTexture("Ryu Intro Sheet", Texture2D.FromStream(GraphicsDevice, File.Open("Ryu Intro Sheet.png", FileMode.Open)));
+
+            // Test, remove later.
+            GameObject ryuIntro = new GameObject();
+            ryuIntro.CurrentAnimation = Animation.ReadAnimationFile("intro_ryu_idle.pcaf");
+            ryuIntro.CurrentAnimation.Play();
+
+            objManager.GetObjects().Add(ryuIntro);
 
             base.Initialize();
         }
@@ -40,7 +60,9 @@ namespace PestControl
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            ContentLoader.LoadTextures(Content);
+            ContentLoader.LoadFonts(Content);
+            ContentLoader.LoadShaders(Content);
         }
 
         /// <summary>
@@ -49,7 +71,6 @@ namespace PestControl
         /// </summary>
         protected override void UnloadContent()
         {
-            // TODO: Unload any non ContentManager content here
         }
 
         /// <summary>
@@ -59,10 +80,7 @@ namespace PestControl
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
-            // TODO: Add your update logic here
+            objManager.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -73,9 +91,13 @@ namespace PestControl
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
-            // TODO: Add your drawing code here
+            spriteBatch.Begin();
+
+            objManager.Draw(GraphicsDevice, spriteBatch);
+
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
