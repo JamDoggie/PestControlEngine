@@ -43,12 +43,6 @@ namespace PestControlEngine.Resource
         {
             _textures.TryGetValue(key, out Texture2D tex);
 
-            if (tex == null)
-            {
-                Console.WriteLine($"Content Loader Error: Could not find Texture {key}");
-                throw new FileNotFoundException($"Content Loader could not find the Texture \"{key}\"");
-            }
-
             return tex;
         }
 

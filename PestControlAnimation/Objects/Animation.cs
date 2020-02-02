@@ -63,11 +63,21 @@ namespace PestControlAnimation.Objects
         {
             if (_isPlaying)
             {
-                _currentMs += deltaTime.ElapsedGameTime.TotalMilliseconds;
-
-                if (_currentMs > EndFrame * 16 && Loop)
+                if (_currentMs > EndFrame * 16)
                 {
-                    _currentMs = LoopToFrame * 16;
+                    if (Loop)
+                    {
+                        _currentMs = LoopToFrame * 16;
+                    }
+                    else
+                    {
+                        _currentMs = EndFrame * 16;
+                    }
+
+                }
+                else
+                {
+                    _currentMs += deltaTime.ElapsedGameTime.TotalMilliseconds;
                 }
             }
         }

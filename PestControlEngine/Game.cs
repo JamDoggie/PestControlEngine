@@ -4,6 +4,8 @@ using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using PestControlAnimation.Objects;
 using PestControlEngine.Graphics;
+using PestControlEngine.GUI;
+using PestControlEngine.Libs.Helpers;
 using PestControlEngine.Objects;
 using PestControlEngine.Resource;
 using System;
@@ -18,7 +20,10 @@ namespace PestControlEngine
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        SpriteBatch guiBatch;
         ObjectManager objManager;
+        Screen debugScreen;
+        GUIManager guiManager;
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -29,6 +34,14 @@ namespace PestControlEngine
             Window.AllowUserResizing = true;
 
             objManager = new ObjectManager();
+
+            debugScreen = new Screen();
+
+            guiManager = new GUIManager();
+            guiManager.LoadScreen("debug_screen", debugScreen);
+
+            
+
         }
 
         /// <summary>
@@ -49,6 +62,8 @@ namespace PestControlEngine
             objManager.GetObjects().Add(ryuIntro);
 
             base.Initialize();
+
+            Util.CurrentResolution = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
         }
 
         /// <summary>
@@ -59,10 +74,22 @@ namespace PestControlEngine
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            guiBatch = new SpriteBatch(GraphicsDevice);
 
             ContentLoader.LoadTextures(Content);
             ContentLoader.LoadFonts(Content);
             ContentLoader.LoadShaders(Content);
+
+            Button button = new Button(new Vector2(200, 200), 200, 10);
+            button.ButtonTextBlock.Text = "Pest Control Debug Screen";
+
+            Grid grid = new Grid();
+            grid.AddCell(button, 0.25d, 0.25d, 0.5d, 0.5d);
+
+            debugScreen.Controls.Add(grid);
+            debugScreen.Controls.Add(button);
+
+            guiManager.SetScreen("debug_screen");
         }
 
         /// <summary>
@@ -81,6 +108,9 @@ namespace PestControlEngine
         protected override void Update(GameTime gameTime)
         {
             objManager.Update(gameTime);
+            guiManager.Update(gameTime);
+
+            Util.CurrentResolution = new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
             base.Update(gameTime);
         }
@@ -98,6 +128,12 @@ namespace PestControlEngine
             objManager.Draw(GraphicsDevice, spriteBatch);
 
             spriteBatch.End();
+
+            guiBatch.Begin();
+
+            guiManager.Draw(gameTime, GraphicsDevice, guiBatch);
+
+            guiBatch.End();
 
             base.Draw(gameTime);
         }

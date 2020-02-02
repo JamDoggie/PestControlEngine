@@ -50,9 +50,9 @@ namespace PestControlEngine.Graphics
         // Returns 1x1 texture that is RGB 255,255,255
         public static Texture2D GetWhitePixel(GraphicsDevice graphicsDevice)
         {
-            if (ContentLoader.GetTexture("engine_onepx") != null)
+            if (ContentLoader.GetTexture("enginereserved_onepx") != null)
             {
-                return ContentLoader.GetTexture("engine_onepx");
+                return ContentLoader.GetTexture("enginereserved_onepx");
             }
 
             Texture2D texture = new Texture2D(graphicsDevice, 1, 1);
@@ -61,12 +61,12 @@ namespace PestControlEngine.Graphics
             texture.SetData(colors);
 
             // Load texture into memory so we don't have to do the expensive operation of generating it every time.
-            ContentLoader.LoadTexture("engine_onepx", texture);
+            ContentLoader.LoadTexture("enginereserved_onepx", texture);
 
             return texture;
         }
 
-        public static void DrawRectangle(SpriteBatch spriteBatch, GraphicsDevice graphicsDevice, Rectangle rectangle, Color color)
+        public static void DrawRectangle(SpriteBatch spriteBatch, GraphicsDevice graphicsDevice, Rectangle rectangle, int strokeSize, Color color)
         {
             Texture2D texture = GetWhitePixel(graphicsDevice);
 
@@ -76,13 +76,13 @@ namespace PestControlEngine.Graphics
             }
 
             // Top part of rectangle
-            spriteBatch.Draw(texture, new Rectangle(rectangle.X, rectangle.Y, rectangle.Width, 1), new Rectangle(0, 0, 1, 1), color);
+            spriteBatch.Draw(texture, new Rectangle(rectangle.X + strokeSize, rectangle.Y, rectangle.Width - strokeSize, strokeSize), new Rectangle(0, 0, 1, 1), color);
             // Left side of rectangle
-            spriteBatch.Draw(texture, new Rectangle(rectangle.X, rectangle.Y + 1, 1, rectangle.Height - 1), new Rectangle(0, 0, 1, 1), color);
+            spriteBatch.Draw(texture, new Rectangle(rectangle.X, rectangle.Y, strokeSize, rectangle.Height), new Rectangle(0, 0, 1, 1), color);
             // Right side of rectangle
-            spriteBatch.Draw(texture, new Rectangle(rectangle.X + rectangle.Width - 1, rectangle.Y + 1, 1, rectangle.Height - 1), new Rectangle(0, 0, 1, 1), color);
+            spriteBatch.Draw(texture, new Rectangle(rectangle.X + rectangle.Width - strokeSize, rectangle.Y, strokeSize, rectangle.Height), new Rectangle(0, 0, 1, 1), color);
             // Bottom part of rectangle
-            spriteBatch.Draw(texture, new Rectangle(rectangle.X, rectangle.Y + rectangle.Height - 1, rectangle.Width, 1), new Rectangle(0, 0, 1, 1), color);
+            spriteBatch.Draw(texture, new Rectangle(rectangle.X + strokeSize, rectangle.Y + rectangle.Height - strokeSize, rectangle.Width - strokeSize, strokeSize), new Rectangle(0, 0, 1, 1), color);
         }
     }
 }

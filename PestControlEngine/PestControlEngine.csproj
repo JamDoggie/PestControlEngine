@@ -46,6 +46,14 @@
     <Compile Include="Event\Structs\MouseClickedArgs.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Graphics\ObjectManager.cs" />
+    <Compile Include="GUI\Button.cs" />
+    <Compile Include="GUI\Enum\EnumHorizontalAlignment.cs" />
+    <Compile Include="GUI\Enum\EnumVerticalAlignment.cs" />
+    <Compile Include="GUI\Grid.cs" />
+    <Compile Include="GUI\GUIManager.cs" />
+    <Compile Include="GUI\Screen.cs" />
+    <Compile Include="GUI\TextElement.cs" />
+    <Compile Include="GUI\UIElement.cs" />
     <Compile Include="Libs\Helpers\FileHelpers.cs" />
     <Compile Include="Libs\Helpers\Util.cs" />
     <Compile Include="Libs\Localization\Localization.cs" />
@@ -123,9 +131,7 @@
     <None Include="app.manifest" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="GUI\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\PestControlAnimation\PestControlAnimation.csproj">
       <Project>{337047c7-254b-4442-81f3-c0b95dea203c}</Project>
