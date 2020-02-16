@@ -20,13 +20,16 @@ namespace PestControlEngine.GUI
 
         public override void Draw(GameTime gameTime, GraphicsDevice device, SpriteBatch spriteBatch)
         {
-            // Little explanation, this draws the text so that monogame doesn't draw it outside it's parent element. This unfortunately does restart the spritebatch which(i believe) can effect performance greatly.
+            // Little explanation, this draws the text so that monogame doesn't draw it outside it's parent element. 
+            //This unfortunately does restart the spritebatch which(i believe) can effect performance even if it's small.
+
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, _RasterizerState);
 
             // Save copy of scissor rectangle for later
             Rectangle currentRect = spriteBatch.GraphicsDevice.ScissorRectangle;
 
+            // Set scissor rectangle to the bounding box of the parent object. This makes it so the text is only rendered within the parent element and will cut off outside of it.
             if (Parent != null)
                 spriteBatch.GraphicsDevice.ScissorRectangle = Parent.GetBoundingBox();
 

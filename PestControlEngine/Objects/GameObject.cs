@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using PestControlAnimation.Objects;
 using PestControlEngine.Event.Structs;
+using PestControlEngine.Libs.Helpers.Structs;
 using PestControlEngine.Resource;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,8 @@ namespace PestControlEngine.Objects
         private GameObject _parent = null;
 
         public Animation CurrentAnimation { get; set; } = new Animation();
+
+        public Rectangle BoundingBox { get; set; } = new Rectangle();
 
         private MouseState previousMouse;
 
@@ -49,15 +52,18 @@ namespace PestControlEngine.Objects
         /// <param name="spriteBatch"></param>
         public virtual void Draw(GraphicsDevice device, SpriteBatch spriteBatch)
         {
-            var orderedSprites = FromJsonSprites(CurrentAnimation.GetCurrentSprite()).OrderBy(f => f.Value.GetLayer()).ToList();
-
-            foreach (KeyValuePair<string, Sprite> pair in orderedSprites)
+            if (CurrentAnimation != null && CurrentAnimation.GetCurrentSprite() != null)
             {
-                Sprite spriteBox = pair.Value;
+                var orderedSprites = FromJsonSprites(CurrentAnimation.GetCurrentSprite()).OrderBy(f => f.Value.GetLayer()).ToList();
 
-                if (spriteBatch != null && ContentLoader.GetTexture(spriteBox.GetTextureKey()) != null && spriteBox.Visible())
+                foreach (KeyValuePair<string, Sprite> pair in orderedSprites)
                 {
-                    spriteBatch.Draw(ContentLoader.GetTexture(spriteBox.GetTextureKey()), new Rectangle((int)(spriteBox.GetPosition().X + GetPosition().X), (int)(spriteBox.GetPosition().Y + GetPosition().Y), spriteBox.GetWidth(), spriteBox.GetHeight()), spriteBox.GetSourceRectangle(), Color.White);
+                    Sprite spriteBox = pair.Value;
+
+                    if (spriteBatch != null && ContentLoader.GetTexture(spriteBox.GetTextureKey()) != null && spriteBox.Visible())
+                    {
+                        spriteBatch.Draw(ContentLoader.GetTexture(spriteBox.GetTextureKey()), new Rectangle((int)(spriteBox.GetPosition().X + GetPosition().X), (int)(spriteBox.GetPosition().Y + GetPosition().Y), spriteBox.GetWidth(), spriteBox.GetHeight()), spriteBox.GetSourceRectangle(), Color.White);
+                    }
                 }
             }
 
@@ -68,12 +74,12 @@ namespace PestControlEngine.Objects
             }
         }
 
-        public virtual void Update(GameTime gameTime)
+        public virtual void Update(GameTime gameTime, GameInfo gameInfo)
         {
             // Update children
             foreach (GameObject d in _children)
             {
-                d.Update(gameTime);
+                d.Update(gameTime, gameInfo);
             }
 
             // Update animation
@@ -115,27 +121,36 @@ namespace PestControlEngine.Objects
 
         public virtual Rectangle GetBoundingBox()
         {
-            int lowestX = 0;
-            int lowestY = 0;
-            int highestX = 0;
-            int highestY = 0;
-
-            foreach(KeyValuePair<string, Sprite> pair in FromJsonSprites(CurrentAnimation.GetCurrentSprite()))
+            if (CurrentAnimation == null || CurrentAnimation.GetCurrentSprite() == null)
             {
-                if (pair.Value.GetPosition().X < lowestX)
-                    lowestX = (int)pair.Value.GetPosition().X;
+                return BoundingBox;
+            }
+            else
+            {
+                int lowestX = 0;
+                int lowestY = 0;
+                int highestX = 0;
+                int highestY = 0;
 
-                if (pair.Value.GetPosition().Y < lowestY)
-                    lowestY = (int)pair.Value.GetPosition().Y;
+                foreach (KeyValuePair<string, Sprite> pair in FromJsonSprites(CurrentAnimation.GetCurrentSprite()))
+                {
+                    if (pair.Value.GetPosition().X < lowestX)
+                        lowestX = (int)pair.Value.GetPosition().X;
 
-                if (pair.Value.GetRectangle().Right > highestX)
-                    highestX = pair.Value.GetRectangle().Right;
+                    if (pair.Value.GetPosition().Y < lowestY)
+                        lowestY = (int)pair.Value.GetPosition().Y;
 
-                if (pair.Value.GetRectangle().Bottom > highestY)
-                    highestY = pair.Value.GetRectangle().Bottom;
+                    if (pair.Value.GetRectangle().Right > highestX)
+                        highestX = pair.Value.GetRectangle().Right;
+
+                    if (pair.Value.GetRectangle().Bottom > highestY)
+                        highestY = pair.Value.GetRectangle().Bottom;
+                }
+
+                return new Rectangle(lowestX + (int)GetPosition().X, lowestY + (int)GetPosition().Y, highestX - lowestX, highestY - lowestY);
             }
 
-            return new Rectangle(lowestX + (int)GetPosition().X, lowestY + (int)GetPosition().Y, highestX - lowestX, highestY - lowestY); 
+            
         }
 
         public virtual Vector2 GetPosition()
@@ -163,6 +178,9 @@ namespace PestControlEngine.Objects
 
         public virtual Dictionary<string, Sprite> GetSpriteBoxes()
         {
+            if (CurrentAnimation == null || CurrentAnimation.GetCurrentSprite() == null)
+                return new Dictionary<string, Sprite>();
+
             return FromJsonSprites(CurrentAnimation.GetCurrentSprite());
         }
 

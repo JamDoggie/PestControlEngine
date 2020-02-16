@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using PestControlEngine.GUI.Enum;
+using PestControlEngine.Libs.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +12,24 @@ namespace PestControlEngine.GUI
 {
     public class Screen
     {
-        public List<UIElement> Controls { get; set; } = new List<UIElement>();
+        private List<UIElement> Controls { get; set; } = new List<UIElement>();
+
+        /// <summary>
+        /// False = fade in
+        /// True = fade out
+        /// </summary>
+        public bool FadeIn { get; set; } = true;
+
+        public float FadeTime { get; set; } = 500;
+
+        private UIRectangle fadeRectangle = null;
+
+        private string _nextScreen = Util.GetEngineNull();
 
         public void Update(GameTime gameTime)
         {
-            foreach(UIElement control in Controls)
+            // Update child controls
+            foreach (UIElement control in Controls)
             {
                 control.Update(gameTime);
             }
@@ -22,10 +37,37 @@ namespace PestControlEngine.GUI
 
         public void Draw(GameTime gameTime, GraphicsDevice device, SpriteBatch spriteBatch)
         {
+            // Draw child controls
             foreach (UIElement control in Controls)
             {
                 control.Draw(gameTime, device, spriteBatch);
             }
+        }
+
+        public void SetNextScreen(string next)
+        {
+            _nextScreen = next;
+        }
+
+        public string GetNextScreen()
+        {
+            return _nextScreen;
+        }
+
+        public void AddControl(UIElement control)
+        {
+            control.ParentScreen = this;
+            Controls.Add(control);
+        }
+
+        public void RemoveControl(UIElement control)
+        {
+            Controls.Remove(control);
+        }
+
+        public List<UIElement> GetControls()
+        {
+            return Controls;
         }
     }
 }

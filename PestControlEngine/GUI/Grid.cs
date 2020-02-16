@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using PestControlEngine.Libs.Helpers;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,8 @@ namespace PestControlEngine.GUI
                 height = Height,
                 Child = element
             });
+
+            AddChild(element);
         }
 
         public void RemoveCell(UIElement element)
@@ -37,21 +40,58 @@ namespace PestControlEngine.GUI
             }
 
             Cells.Remove(toRemove);
+
+            RemoveChild(element);
         }
 
         public override void Update(GameTime gameTime)
         {
-            base.Update(gameTime);
+            if (ParentScreen == null)
+            {
+                Console.WriteLine("no parent");
+            }
 
-            foreach(GridCell cell in Cells)
+            if (Parent == null)
+            {
+                Width = (int)Game.GetGame().GetResolution().X + 1;
+                Height = (int)Game.GetGame().GetResolution().Y + 1;
+            }
+            else
+            {
+                Width = Parent.Width;
+                Height = Parent.Height;
+            }
+
+            foreach (GridCell cell in Cells)
             {
                 if (cell.Child != null)
                 {
-                    cell.Child.Position = new Vector2((int)(Util.CurrentResolution.X * (float)cell.posX), (int)(Util.CurrentResolution.Y * (float)cell.posY));
-                    cell.Child.Width = (int)(Util.CurrentResolution.X * cell.width);
-                    cell.Child.Height = (int)(Util.CurrentResolution.Y * cell.height);
+                    float parentWidth;
+                    float parentHeight;
+
+                    if (cell.Child.Parent != null)
+                    {
+                        parentWidth = cell.Child.Parent.Width;
+                        parentHeight = cell.Child.Parent.Height;
+                    }
+                    else
+                    {
+                        parentWidth = Game.GetGame().GetResolution().X + 1;
+                        parentHeight = Game.GetGame().GetResolution().Y + 1;
+                    }
+
+                    cell.Child.Position = new Vector2((int)(parentWidth * (float)cell.posX), (int)(parentHeight * (float)cell.posY));
+                    cell.Child.Width = (int)(parentWidth * cell.width);
+                    cell.Child.Height = (int)(parentHeight * cell.height);
                 }
             }
+
+            base.Update(gameTime);
+        }
+
+        public override void Draw(GameTime gameTime, GraphicsDevice device, SpriteBatch spriteBatch)
+        {
+            base.Draw(gameTime, device, spriteBatch);
         }
     }
 

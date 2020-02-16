@@ -17,23 +17,28 @@ namespace PestControlEngine.GUI
         // Variables
         public Vector2 Position;
 
-        public int Width { get; set; }
+        public int Width;
+
+
+        public int Height;
+
+        public Screen ParentScreen = null;
+
+        public Vector2 RenderPosition = new Vector2();
         
-        public int Height { get; set; }
-
-        private MouseState _previousMouse = new MouseState();
-
-        public Vector2 RenderPosition { get; set; } = new Vector2();
-
-        public UIElement Parent { get; set; }
+        public UIElement Parent = null;
 
         public bool DynamicallyScale { get; set; }
 
-        public EnumHorizontalAlignment HorizontalAlignment;
+        public EnumHorizontalAlignment HorizontalAlignment = EnumHorizontalAlignment.NONE;
 
-        public EnumVerticalAlignment VerticalAlignment;
+        public EnumVerticalAlignment VerticalAlignment = EnumVerticalAlignment.NONE;
+
+        public bool FillParent = false;
 
         private List<UIElement> _Children { get; set; } = new List<UIElement>();
+
+        private MouseState _previousMouse = new MouseState();
 
         // Events
         public delegate void MouseClick(MouseEventArgs e);
@@ -63,11 +68,6 @@ namespace PestControlEngine.GUI
 
         public virtual void Update(GameTime gameTime)
         {
-            if (Parent != null && Parent.Position != null)
-            {
-                RenderPosition = Position + Parent.Position;
-            }
-
             // Alignment
             if (Parent != null)
             {
@@ -95,6 +95,23 @@ namespace PestControlEngine.GUI
                     case EnumVerticalAlignment.BOTTOM:
                         Position.Y = Parent.Height - Height;
                         break;
+                }
+            }
+
+            // Filling
+            if (FillParent)
+            {
+                Position = new Vector2(0, 0);
+
+                if (Parent != null)
+                {
+                    Width = Parent.Width;
+                    Height = Parent.Height;
+                }
+                else
+                {
+                    Width = (int)Game.GetGame().GetResolution().X;
+                    Height = (int)Game.GetGame().GetResolution().Y;
                 }
             }
 
@@ -144,9 +161,18 @@ namespace PestControlEngine.GUI
                 });
             }
 
-            foreach(UIElement element in _Children)
+            foreach (UIElement element in _Children)
             {
                 element.Update(gameTime);
+            }
+
+            if (Parent != null && Parent.Position != null)
+            {
+                RenderPosition = Position + Parent.Position;
+            }
+            else
+            {
+                RenderPosition = Position;
             }
 
             _previousMouse = Mouse.GetState();
@@ -162,7 +188,7 @@ namespace PestControlEngine.GUI
 
         public virtual Rectangle GetBoundingBox()
         {
-            return new Rectangle((int)Position.X, (int)Position.Y, Width, Height);
+            return new Rectangle((int)RenderPosition.X, (int)RenderPosition.Y, Width, Height);
         }
 
         public virtual List<UIElement> GetChildren()
@@ -180,6 +206,7 @@ namespace PestControlEngine.GUI
         {
             _Children.Add(child);
             child.Parent = this;
+            child.ParentScreen = ParentScreen;
         }
 
         // Base event methods

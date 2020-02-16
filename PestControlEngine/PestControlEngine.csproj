@@ -45,18 +45,22 @@
   <ItemGroup>
     <Compile Include="Event\Structs\MouseClickedArgs.cs" />
     <Compile Include="Game.cs" />
-    <Compile Include="Graphics\ObjectManager.cs" />
+    <Compile Include="GameManagers\ObjectManager.cs" />
     <Compile Include="GUI\Button.cs" />
     <Compile Include="GUI\Enum\EnumHorizontalAlignment.cs" />
     <Compile Include="GUI\Enum\EnumVerticalAlignment.cs" />
+    <Compile Include="GUI\Enum\StretchType.cs" />
     <Compile Include="GUI\Grid.cs" />
     <Compile Include="GUI\GUIManager.cs" />
     <Compile Include="GUI\Screen.cs" />
     <Compile Include="GUI\TextElement.cs" />
     <Compile Include="GUI\UIElement.cs" />
+    <Compile Include="GUI\UIRectangle.cs" />
     <Compile Include="Libs\Helpers\FileHelpers.cs" />
+    <Compile Include="Libs\Helpers\Structs\GameInfo.cs" />
     <Compile Include="Libs\Helpers\Util.cs" />
     <Compile Include="Libs\Localization\Localization.cs" />
+    <Compile Include="Objects\GameCamera.cs" />
     <Compile Include="Objects\GameObject.cs" />
     <Compile Include="Objects\Sprite.cs" />
     <Compile Include="Program.cs" />
