@@ -97,9 +97,9 @@ namespace PestControlEngine.GameManagers
             if (_RenderTarget != null)
                 _RenderTarget.Dispose();
 
-            _RenderTarget = new RenderTarget2D(info.graphicsDevice, VirtualViewWidth, VirtualViewHeight, false, info.graphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24);
+            _RenderTarget = new RenderTarget2D(info.graphicsDevice, VirtualViewWidth, VirtualViewHeight, false, info.graphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
 
-            
+
 
             foreach (GameObject drawable in Objects)
             {

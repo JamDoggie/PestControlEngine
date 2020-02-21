@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PestControlEngine.GameManagers;
+using PestControlEngine.Libs.Helpers.Structs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace PestControlEngine.GUI
 
         public bool Filled { get; set; } = true;
 
-        public override void Draw(GameTime gameTime, GraphicsDevice device, SpriteBatch spriteBatch)
+        public override void Draw(GameTime gameTime, GraphicsDevice device, SpriteBatch spriteBatch, GameInfo info)
         {
             if (Filled)
             {
@@ -28,7 +29,7 @@ namespace PestControlEngine.GUI
                 ObjectManager.DrawRectangle(spriteBatch, device, GetBoundingBox(), StrokeSize, RectangleColor);
             }
 
-            base.Draw(gameTime, device, spriteBatch);
+            base.Draw(gameTime, device, spriteBatch, info);
         }
     }
 }

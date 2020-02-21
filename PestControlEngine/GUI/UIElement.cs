@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using PestControlEngine.Event.Structs;
 using PestControlEngine.GUI.Enum;
 using PestControlEngine.Libs.Helpers;
+using PestControlEngine.Libs.Helpers.Structs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,7 +67,7 @@ namespace PestControlEngine.GUI
             MouseLeaveEvent += MouseLeave_event;
         }
 
-        public virtual void Update(GameTime gameTime)
+        public virtual void Update(GameTime gameTime, GameInfo info)
         {
             // Alignment
             if (Parent != null)
@@ -110,60 +111,76 @@ namespace PestControlEngine.GUI
                 }
                 else
                 {
-                    Width = (int)Game.GetGame().GetResolution().X;
-                    Height = (int)Game.GetGame().GetResolution().Y;
+                    Width = (int)info.Resolution.X;
+                    Height = (int)info.Resolution.Y;
                 }
             }
 
             // Events
-            if (new Rectangle(Mouse.GetState().X, Mouse.GetState().Y, 1, 1).Intersects(GetBoundingBox()) && Mouse.GetState().LeftButton == ButtonState.Pressed && _previousMouse.LeftButton == ButtonState.Released)
+            Rectangle RenderBox = GetBoundingBox();
+
+            if (info.guiManager.UseVirtualSize)
+            {
+                float scaleX = (float)info.graphicsDevice.PresentationParameters.BackBufferWidth / (float)info.guiManager.VirtualViewWidth;
+                float scaleY = (float)info.graphicsDevice.PresentationParameters.BackBufferHeight / (float)info.guiManager.VirtualViewHeight;
+
+                RenderBox = new Rectangle((int)((float)GetBoundingBox().X * scaleX), (int)((float)GetBoundingBox().Y * scaleY), (int)((float)GetBoundingBox().Width * scaleX), (int)((float)GetBoundingBox().Height * scaleY));
+            }
+                
+
+            if (new Rectangle(Mouse.GetState().X, Mouse.GetState().Y, 1, 1).Intersects(RenderBox) && Mouse.GetState().LeftButton == ButtonState.Pressed && _previousMouse.LeftButton == ButtonState.Released)
             {
                 MouseClickedEvent.Invoke(new MouseEventArgs()
                 {
                     MouseState = Mouse.GetState(),
-                    Position = new Vector2(Mouse.GetState().X, Mouse.GetState().Y)
+                    Position = new Vector2(Mouse.GetState().X, Mouse.GetState().Y),
+                    gameInfo = info
                 });
             }
 
-            if (new Rectangle(Mouse.GetState().X, Mouse.GetState().Y, 1, 1).Intersects(GetBoundingBox()) && Mouse.GetState().LeftButton == ButtonState.Released && _previousMouse.LeftButton == ButtonState.Pressed)
+            if (new Rectangle(Mouse.GetState().X, Mouse.GetState().Y, 1, 1).Intersects(RenderBox) && Mouse.GetState().LeftButton == ButtonState.Released && _previousMouse.LeftButton == ButtonState.Pressed)
             {
                 MouseReleasedEvent.Invoke(new MouseEventArgs()
                 {
                     MouseState = Mouse.GetState(),
-                    Position = new Vector2(Mouse.GetState().X, Mouse.GetState().Y)
+                    Position = new Vector2(Mouse.GetState().X, Mouse.GetState().Y),
+                    gameInfo = info
                 });
             }
 
-            if (new Rectangle(Mouse.GetState().X, Mouse.GetState().Y, 1, 1).Intersects(GetBoundingBox()))
+            if (new Rectangle(Mouse.GetState().X, Mouse.GetState().Y, 1, 1).Intersects(RenderBox))
             {
                 MouseMovedEvent.Invoke(new MouseEventArgs()
                 {
                     MouseState = Mouse.GetState(),
-                    Position = new Vector2(Mouse.GetState().X, Mouse.GetState().Y)
+                    Position = new Vector2(Mouse.GetState().X, Mouse.GetState().Y),
+                    gameInfo = info
                 });
             }
 
-            if (new Rectangle(Mouse.GetState().X, Mouse.GetState().Y, 1, 1).Intersects(GetBoundingBox()) && !new Rectangle(_previousMouse.X, _previousMouse.Y, 1, 1).Intersects(GetBoundingBox()))
+            if (new Rectangle(Mouse.GetState().X, Mouse.GetState().Y, 1, 1).Intersects(RenderBox) && !new Rectangle(_previousMouse.X, _previousMouse.Y, 1, 1).Intersects(RenderBox))
             {
                 MouseEnterEvent.Invoke(new MouseEventArgs()
                 {
                     MouseState = Mouse.GetState(),
-                    Position = new Vector2(Mouse.GetState().X, Mouse.GetState().Y)
+                    Position = new Vector2(Mouse.GetState().X, Mouse.GetState().Y),
+                    gameInfo = info
                 });
             }
 
-            if (!new Rectangle(Mouse.GetState().X, Mouse.GetState().Y, 1, 1).Intersects(GetBoundingBox()) && new Rectangle(_previousMouse.X, _previousMouse.Y, 1, 1).Intersects(GetBoundingBox()))
+            if (!new Rectangle(Mouse.GetState().X, Mouse.GetState().Y, 1, 1).Intersects(RenderBox) && new Rectangle(_previousMouse.X, _previousMouse.Y, 1, 1).Intersects(RenderBox))
             {
                 MouseLeaveEvent.Invoke(new MouseEventArgs()
                 {
                     MouseState = Mouse.GetState(),
-                    Position = new Vector2(Mouse.GetState().X, Mouse.GetState().Y)
+                    Position = new Vector2(Mouse.GetState().X, Mouse.GetState().Y),
+                    gameInfo = info
                 });
             }
 
             foreach (UIElement element in _Children)
             {
-                element.Update(gameTime);
+                element.Update(gameTime, info);
             }
 
             if (Parent != null && Parent.Position != null)
@@ -178,11 +195,11 @@ namespace PestControlEngine.GUI
             _previousMouse = Mouse.GetState();
         }
 
-        public virtual void Draw(GameTime gameTime, GraphicsDevice device, SpriteBatch spriteBatch)
+        public virtual void Draw(GameTime gameTime, GraphicsDevice device, SpriteBatch spriteBatch, GameInfo info)
         {
             foreach (UIElement element in _Children)
             {
-                element.Draw(gameTime, device, spriteBatch);
+                element.Draw(gameTime, device, spriteBatch, info);
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
 using PestControlEngine.Libs.Helpers;
@@ -16,6 +17,9 @@ namespace PestControlEngine.Resource
         private static Dictionary<string, Texture2D> _textures = new Dictionary<string, Texture2D>();
         private static Dictionary<string, BitmapFont> _fonts = new Dictionary<string, BitmapFont>();
         private static Dictionary<string, Effect> _effects = new Dictionary<string, Effect>();
+        private static Dictionary<string, SoundEffect> _sounds = new Dictionary<string, SoundEffect>();
+
+        public static string ContentPath = "Content/";
 
         public static void LoadTextures(ContentManager Content)
         {
@@ -32,6 +36,12 @@ namespace PestControlEngine.Resource
         {
             Effect blackwhite_gradient = Content.Load<Effect>("blackwhite_gradient");
             LoadShader("blackwhite_gradient", blackwhite_gradient);
+        }
+
+        public static void LoadSounds(ContentManager Content)
+        {
+            FileStream stream = File.OpenRead($"{ContentPath}sound/GUI/menu_select.wav");
+            LoadSound("menu_select", SoundEffect.FromStream(stream));
         }
 
         /// <summary>
@@ -82,6 +92,24 @@ namespace PestControlEngine.Resource
         }
 
         /// <summary>
+        /// Returns a sound from the _sounds list. If the sound has not been loaded into memory, it will return null even if the sound exists in the game files.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static SoundEffect GetSound(string key)
+        {
+            _sounds.TryGetValue(key, out SoundEffect snd);
+
+            if (snd == null)
+            {
+                Console.WriteLine($"Content Loader Error: Could not find Sound {key}");
+                throw new FileNotFoundException($"Content Loader could not find the Sound \"{key}\"");
+            }
+
+            return snd;
+        }
+
+        /// <summary>
         /// Loads the texture into the dictionary and in turn the memory.
         /// </summary>
         /// <param name="key"></param>
@@ -109,6 +137,16 @@ namespace PestControlEngine.Resource
         public static void LoadShader(string key, Effect shader)
         {
             _effects[key] = shader;
+        }
+
+        /// <summary>
+        /// Loads the sound into the dictionary and in turn the memory.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="sound"></param>
+        public static void LoadSound(string key, SoundEffect sound)
+        {
+            _sounds[key] = sound;
         }
     }
 

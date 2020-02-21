@@ -65,13 +65,15 @@ namespace PestControlAnimation.Objects
             {
                 if (_currentMs > EndFrame * 16)
                 {
+                    double msDifference = _currentMs - EndFrame * 16;
                     if (Loop)
                     {
-                        _currentMs = LoopToFrame * 16;
+                        _currentMs = LoopToFrame * 16 + msDifference;
                     }
                     else
                     {
                         _currentMs = EndFrame * 16;
+                        _isPlaying = false;
                     }
 
                 }

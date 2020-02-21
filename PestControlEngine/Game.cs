@@ -5,10 +5,12 @@ using MonoGame.Extended;
 using PestControlAnimation.Objects;
 using PestControlEngine.GameManagers;
 using PestControlEngine.GUI;
+using PestControlEngine.GUI.Enum;
 using PestControlEngine.Libs.Helpers;
 using PestControlEngine.Libs.Helpers.Structs;
 using PestControlEngine.Objects;
 using PestControlEngine.Resource;
+using PestControlEngine.Sound;
 using System;
 using System.IO;
 
@@ -26,14 +28,15 @@ namespace PestControlEngine
         Screen debugScreen;
         Screen fadeTest;
         public GUIManager guiManager;
-
-        // Scary static variable ooOOooOO spOoKy
-        private static Game _CurrentGame = null;
+        public SoundManager soundManager;
 
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            IsFixedTimeStep = false;
+            graphics.SynchronizeWithVerticalRetrace = false;
 
             IsMouseVisible = true;
 
@@ -48,7 +51,9 @@ namespace PestControlEngine
             guiManager.LoadScreen("debug_screen", debugScreen);
             guiManager.LoadScreen("fade_screen", fadeTest);
 
-            _CurrentGame = this;
+            GameInfo gameInfo = new GameInfo(GraphicsDevice, spriteBatch, objManager, guiManager, GetResolution(), Content, soundManager);
+
+            soundManager = new SoundManager(gameInfo);
         }
 
         /// <summary>
@@ -74,6 +79,8 @@ namespace PestControlEngine
             };
             objManager.GetObjects().Add(MainCamera);
 
+            GraphicsDevice.PresentationParameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
+
             base.Initialize();
         }
 
@@ -87,20 +94,29 @@ namespace PestControlEngine
             spriteBatch = new SpriteBatch(GraphicsDevice);
             guiBatch = new SpriteBatch(GraphicsDevice);
 
+            
+
             ContentLoader.LoadTextures(Content);
             ContentLoader.LoadFonts(Content);
             ContentLoader.LoadShaders(Content);
+            ContentLoader.LoadSounds(Content);
+
 
             Grid grid = new Grid();
 
             Button button = new Button(new Vector2(200, 200), 200, 200);
-            button.ButtonTextBlock.Text = "Pest Control Debug Screen";
+            button.ButtonTextBlock.Text = "Scale Test";
             button.ScaleToText = false;
 
             
             grid.AddCell(button, 0.25d, 0.25d, 0.5d, 0.5d);
 
             debugScreen.AddControl(grid);
+
+            UIFPSCounter fpsCounter = new UIFPSCounter();
+            fpsCounter.HorizontalAlignment = EnumHorizontalAlignment.RIGHT;
+
+            debugScreen.AddControl(fpsCounter);
 
             // TEST SCREEN FOR FADING
             Grid grid2 = new Grid();
@@ -132,10 +148,10 @@ namespace PestControlEngine
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            GameInfo gameInfo = new GameInfo(GraphicsDevice, spriteBatch, objManager);
+            GameInfo gameInfo = new GameInfo(GraphicsDevice, spriteBatch, objManager, guiManager, GetResolution(), Content, soundManager);
 
             objManager.Update(gameTime, gameInfo);
-            guiManager.Update(gameTime);
+            guiManager.Update(gameTime, gameInfo);
 
             base.Update(gameTime);
         }
@@ -146,31 +162,24 @@ namespace PestControlEngine
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GameInfo gameInfo = new GameInfo(GraphicsDevice, spriteBatch, objManager);
+            GameInfo gameInfo = new GameInfo(GraphicsDevice, spriteBatch, objManager, guiManager, GetResolution(), Content, soundManager);
 
             GraphicsDevice.Clear(Color.Black);
 
             // Draw objects in current map.
             objManager.Draw(GraphicsDevice, spriteBatch, gameInfo);
 
-
-            guiBatch.Begin();
-
-            guiManager.Draw(gameTime, GraphicsDevice, guiBatch);
-
-            guiBatch.End();
+            guiManager.Draw(gameTime, GraphicsDevice, guiBatch, gameInfo);
 
             base.Draw(gameTime);
         }
 
         public Vector2 GetResolution()
         {
-            return new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-        }
+            if (objManager.UseVirtualSize)
+                return new Vector2(objManager.VirtualViewWidth, objManager.VirtualViewHeight);
 
-        public static Game GetGame()
-        {
-            return _CurrentGame;
+            return new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
         }
     }
 }

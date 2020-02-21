@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PestControlEngine.Libs.Helpers;
+using PestControlEngine.Libs.Helpers.Structs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +45,7 @@ namespace PestControlEngine.GUI
             RemoveChild(element);
         }
 
-        public override void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime, GameInfo info)
         {
             if (ParentScreen == null)
             {
@@ -53,8 +54,8 @@ namespace PestControlEngine.GUI
 
             if (Parent == null)
             {
-                Width = (int)Game.GetGame().GetResolution().X + 1;
-                Height = (int)Game.GetGame().GetResolution().Y + 1;
+                Width = (int)info.Resolution.X + 1;
+                Height = (int)info.Resolution.Y + 1;
             }
             else
             {
@@ -76,8 +77,8 @@ namespace PestControlEngine.GUI
                     }
                     else
                     {
-                        parentWidth = Game.GetGame().GetResolution().X + 1;
-                        parentHeight = Game.GetGame().GetResolution().Y + 1;
+                        parentWidth = info.Resolution.X + 1;
+                        parentHeight = info.Resolution.Y + 1;
                     }
 
                     cell.Child.Position = new Vector2((int)(parentWidth * (float)cell.posX), (int)(parentHeight * (float)cell.posY));
@@ -86,12 +87,12 @@ namespace PestControlEngine.GUI
                 }
             }
 
-            base.Update(gameTime);
+            base.Update(gameTime, info);
         }
 
-        public override void Draw(GameTime gameTime, GraphicsDevice device, SpriteBatch spriteBatch)
+        public override void Draw(GameTime gameTime, GraphicsDevice device, SpriteBatch spriteBatch, GameInfo info)
         {
-            base.Draw(gameTime, device, spriteBatch);
+            base.Draw(gameTime, device, spriteBatch, info);
         }
     }
 

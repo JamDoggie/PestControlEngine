@@ -37,3 +37,9 @@
 /processorParam:TextureFormat=Color
 /build:engine_font_0.png
 
+#begin sound/gui/menu_select.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:sound/gui/menu_select.ogg
+

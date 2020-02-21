@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
+using PestControlEngine.Libs.Helpers.Structs;
 using PestControlEngine.Resource;
 using System;
 using System.Collections.Generic;
@@ -18,38 +19,45 @@ namespace PestControlEngine.GUI
 
         private RasterizerState _RasterizerState = new RasterizerState() { ScissorTestEnable = true };
 
-        public override void Draw(GameTime gameTime, GraphicsDevice device, SpriteBatch spriteBatch)
+        public override void Draw(GameTime gameTime, GraphicsDevice device, SpriteBatch spriteBatch, GameInfo info)
         {
-            // Little explanation, this draws the text so that monogame doesn't draw it outside it's parent element. 
-            //This unfortunately does restart the spritebatch which(i believe) can effect performance even if it's small.
+            if (Parent == null)
+            {
+                // Little explanation, this draws the text so that monogame doesn't draw it outside it's parent element. 
+                //This unfortunately does restart the spritebatch which(i believe) can effect performance even if it's small.
 
-            spriteBatch.End();
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, _RasterizerState);
+                spriteBatch.End();
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, _RasterizerState);
 
-            // Save copy of scissor rectangle for later
-            Rectangle currentRect = spriteBatch.GraphicsDevice.ScissorRectangle;
+                // Save copy of scissor rectangle for later
+                Rectangle currentRect = spriteBatch.GraphicsDevice.ScissorRectangle;
 
-            // Set scissor rectangle to the bounding box of the parent object. This makes it so the text is only rendered within the parent element and will cut off outside of it.
-            if (Parent != null)
-                spriteBatch.GraphicsDevice.ScissorRectangle = Parent.GetBoundingBox();
+                // Set scissor rectangle to the bounding box of the parent object. This makes it so the text is only rendered within the parent element and will cut off outside of it.
+                if (Parent != null)
+                    spriteBatch.GraphicsDevice.ScissorRectangle = Parent.GetBoundingBox();
 
-            spriteBatch.DrawString(ContentLoader.GetFont("engine_font"), Text, RenderPosition, TextColor);
+                spriteBatch.DrawString(ContentLoader.GetFont("engine_font"), Text, RenderPosition, TextColor);
 
-            // Restore scissor rectangle
-            spriteBatch.GraphicsDevice.ScissorRectangle = currentRect;
+                // Restore scissor rectangle
+                spriteBatch.GraphicsDevice.ScissorRectangle = currentRect;
 
-            spriteBatch.End();
-            spriteBatch.Begin();
+                spriteBatch.End();
+                spriteBatch.Begin();
+            }
+            else
+            {
+                spriteBatch.DrawString(ContentLoader.GetFont("engine_font"), Text, RenderPosition, TextColor);
+            }
 
-            base.Draw(gameTime, device, spriteBatch);
+            base.Draw(gameTime, device, spriteBatch, info);
         }
 
-        public override void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime, GameInfo info)
         {
             Width = (int)ContentLoader.GetFont("engine_font").MeasureString(Text).Width;
             Height = (int)ContentLoader.GetFont("engine_font").MeasureString(Text).Height;
 
-            base.Update(gameTime);
+            base.Update(gameTime, info);
         }
     }
 }

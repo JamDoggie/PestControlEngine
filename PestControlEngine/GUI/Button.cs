@@ -4,6 +4,7 @@ using PestControlEngine.Event.Structs;
 using PestControlEngine.GameManagers;
 using PestControlEngine.GUI.Enum;
 using PestControlEngine.Libs.Helpers;
+using PestControlEngine.Libs.Helpers.Structs;
 using PestControlEngine.Resource;
 using System;
 using System.Collections.Generic;
@@ -19,17 +20,31 @@ namespace PestControlEngine.GUI
 
         public UIRectangle ButtonRectangle = new UIRectangle();
 
+        public UIRectangle ButtonInnerRectangle = new UIRectangle();
+
+
+        // Outline colors
         public Color OutlineColor { get; set; } = Color.White;
 
         public Color OutlineHoverColor { get; set; } = new Color(170, 170, 170);
 
         public Color OutlinePressColor { get; set; } = new Color(110, 110, 110);
 
+
+        // Inner rectangle colors
+        public Color InnerColor { get; set; } = new Color(170, 170, 170, 160);
+
+        public Color InnerHoverColor { get; set; } = new Color(150, 150, 150, 160);
+
+        public Color InnerPressColor { get; set; } = new Color(90, 90, 90, 160);
+
         public Color TextColor { get; set; } = Color.White;
+
 
         public int LineThickness { get; set; } = 2;
 
         private Color _CurrentOutlineColor = Color.White;
+        private Color _CurrentInnerColor = new Color(235, 235, 235);
 
         public bool IsHovered { get; set; } = false;
 
@@ -43,12 +58,6 @@ namespace PestControlEngine.GUI
             Width = width;
             Height = height;
 
-            // Text element
-            AddChild(ButtonTextBlock);
-
-            ButtonTextBlock.HorizontalAlignment = EnumHorizontalAlignment.CENTER;
-            ButtonTextBlock.VerticalAlignment = EnumVerticalAlignment.CENTER;
-
             // Rectangle element
             AddChild(ButtonRectangle);
 
@@ -56,6 +65,18 @@ namespace PestControlEngine.GUI
             ButtonRectangle.StrokeSize = LineThickness;
             ButtonRectangle.FillParent = true;
 
+            // Inner Rectangle Element
+            AddChild(ButtonInnerRectangle);
+
+            ButtonInnerRectangle.Filled = true;
+
+            // Text element
+            AddChild(ButtonTextBlock);
+
+            ButtonTextBlock.HorizontalAlignment = EnumHorizontalAlignment.CENTER;
+            ButtonTextBlock.VerticalAlignment = EnumVerticalAlignment.CENTER;
+
+            // Default outline color set
             _CurrentOutlineColor = OutlineColor;
 
             // Event stuff
@@ -67,7 +88,7 @@ namespace PestControlEngine.GUI
             DynamicallyScale = true;
         }
 
-        public override void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime, GameInfo info)
         {
             // Resize to fit with text.
             if (ScaleToText)
@@ -81,24 +102,38 @@ namespace PestControlEngine.GUI
             if (IsHovered || IsPressed)
             {
                 if (IsHovered)
+                {
                     _CurrentOutlineColor = OutlineHoverColor;
+                    _CurrentInnerColor = InnerHoverColor;
+                }
+                    
 
                 if (IsPressed)
+                {
                     _CurrentOutlineColor = OutlinePressColor;
+                    _CurrentInnerColor = InnerPressColor;
+                }
             }
             else
             {
                 _CurrentOutlineColor = OutlineColor;
+                _CurrentInnerColor = InnerColor;
             }
 
             ButtonRectangle.RectangleColor = _CurrentOutlineColor;
+            ButtonInnerRectangle.RectangleColor = _CurrentInnerColor;
 
-            base.Update(gameTime);
+            base.Update(gameTime, info);
+
+            // Inner rectangle
+            ButtonInnerRectangle.Position = new Vector2(ButtonRectangle.StrokeSize, ButtonRectangle.StrokeSize);
+            ButtonInnerRectangle.Width = Width - (ButtonRectangle.StrokeSize * 2);
+            ButtonInnerRectangle.Height = Height - (ButtonRectangle.StrokeSize * 2);
         }
 
-        public override void Draw(GameTime gameTime, GraphicsDevice device, SpriteBatch spriteBatch)
+        public override void Draw(GameTime gameTime, GraphicsDevice device, SpriteBatch spriteBatch, GameInfo info)
         {
-            base.Draw(gameTime, device, spriteBatch);
+            base.Draw(gameTime, device, spriteBatch, info);
         }
 
         private void Button_MouseEnterEvent(MouseEventArgs e)
@@ -116,19 +151,9 @@ namespace PestControlEngine.GUI
         {
             IsPressed = true;
 
-            if (ButtonTextBlock.Text == "Faded")
+            if (e.gameInfo != null)
             {
-                if (Game.GetGame().guiManager != null)
-                {
-                    Game.GetGame().guiManager.SetScreen("debug_screen");
-                }
-            }
-            else
-            {
-                if (Game.GetGame().guiManager != null)
-                {
-                    Game.GetGame().guiManager.SetScreen("fade_screen");
-                }
+                e.gameInfo.SoundManager.PlaySoundRaw("menu_select");
             }
         }
 

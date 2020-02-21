@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using PestControlEngine.GUI.Enum;
 using PestControlEngine.Libs.Helpers;
+using PestControlEngine.Libs.Helpers.Structs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,21 +27,21 @@ namespace PestControlEngine.GUI
 
         private string _nextScreen = Util.GetEngineNull();
 
-        public void Update(GameTime gameTime)
+        public void Update(GameTime gameTime, GameInfo info)
         {
             // Update child controls
             foreach (UIElement control in Controls)
             {
-                control.Update(gameTime);
+                control.Update(gameTime, info);
             }
         }
 
-        public void Draw(GameTime gameTime, GraphicsDevice device, SpriteBatch spriteBatch)
+        public void Draw(GameTime gameTime, GraphicsDevice device, SpriteBatch spriteBatch, GameInfo info)
         {
             // Draw child controls
             foreach (UIElement control in Controls)
             {
-                control.Draw(gameTime, device, spriteBatch);
+                control.Draw(gameTime, device, spriteBatch, info);
             }
         }
 
