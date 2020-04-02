@@ -33,6 +33,10 @@ namespace PestControlEngine.Objects
             SetPosition(new Vector2(bounds.X, bounds.Y));
         }
 
+        public GameCamera()
+        {
+
+        }
 
         private void UpdateVisibleArea()
         {

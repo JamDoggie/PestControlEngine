@@ -14,9 +14,9 @@ using System.Threading.Tasks;
 
 namespace PestControlEngine.GUI
 {
-    public class Button : UIElement
+    public class UIButton : UIElement
     {
-        public TextElement ButtonTextBlock = new TextElement();
+        public UITextElement ButtonTextBlock = new UITextElement();
 
         public UIRectangle ButtonRectangle = new UIRectangle();
 
@@ -52,7 +52,7 @@ namespace PestControlEngine.GUI
 
         public bool ScaleToText { get; set; } = true;
 
-        public Button(Vector2 position, int width, int height)
+        public UIButton(Vector2 position, int width, int height)
         {
             Position = position;
             Width = width;

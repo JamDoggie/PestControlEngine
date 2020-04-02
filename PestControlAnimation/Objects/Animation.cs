@@ -26,6 +26,11 @@ namespace PestControlAnimation.Objects
         private bool _isPlaying = false;
         private double _currentMs = 0;
 
+        public Animation()
+        {
+            KeyFrames = new List<KeyFrame>();
+        }
+
         public bool IsPlaying()
         {
             return _isPlaying;
@@ -96,6 +101,7 @@ namespace PestControlAnimation.Objects
                 for (int i = 0; i < KeyFrames.Count; i++)
                 {
                     int scrubberPos = (int)Math.Floor(_currentMs / 16);
+
                     KeyFrame currentFrame = KeyFrames.ElementAt(i);
 
                     bool isValid = true;

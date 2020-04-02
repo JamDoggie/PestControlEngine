@@ -4,6 +4,8 @@ using Microsoft.Xna.Framework.Input;
 using PestControlAnimation.Objects;
 using PestControlEngine.Event.Structs;
 using PestControlEngine.Libs.Helpers.Structs;
+using PestControlEngine.Mapping;
+using PestControlEngine.Mapping.Enums;
 using PestControlEngine.Resource;
 using System;
 using System.Collections.Generic;
@@ -18,15 +20,19 @@ namespace PestControlEngine.Objects
         // Variables
         private Vector2 _Position = new Vector2();
 
-        private string _Name = "";
+        public string Name = "";
 
         private List<GameObject> _children = new List<GameObject>();
 
         private GameObject _parent = null;
 
+        public Rectangle BoundingBox { get; set; } = new Rectangle();
+
         public Animation CurrentAnimation { get; set; } = new Animation();
 
-        public Rectangle BoundingBox { get; set; } = new Rectangle();
+        // These properties are purely for exporting a PCOI file for mapping. Make sure the key in the dictionary is the name of the variable here. 
+        // They're pretty much just outlets to expose variables to the map editor.
+        public Dictionary<string, GameObjectProperty> Properties = new Dictionary<string, GameObjectProperty>();
 
         private MouseState previousMouse;
 
@@ -42,6 +48,12 @@ namespace PestControlEngine.Objects
             // Event init
             MouseClickedEvent += MouseClicked;
             MouseMovedEvent += MouseMoved;
+
+            /// Properties for use in the map editor
+
+            // Object Name
+            var nameProperty = new GameObjectProperty("Name", PropertyType.STRING);
+            Properties.Add("Name", nameProperty);
         }
 
         /// <summary>
@@ -52,21 +64,6 @@ namespace PestControlEngine.Objects
         /// <param name="spriteBatch"></param>
         public virtual void Draw(GraphicsDevice device, SpriteBatch spriteBatch)
         {
-            if (CurrentAnimation != null && CurrentAnimation.GetCurrentSprite() != null)
-            {
-                var orderedSprites = FromJsonSprites(CurrentAnimation.GetCurrentSprite()).OrderBy(f => f.Value.GetLayer()).ToList();
-
-                foreach (KeyValuePair<string, Sprite> pair in orderedSprites)
-                {
-                    Sprite spriteBox = pair.Value;
-
-                    if (spriteBatch != null && ContentLoader.GetTexture(spriteBox.GetTextureKey()) != null && spriteBox.Visible())
-                    {
-                        spriteBatch.Draw(ContentLoader.GetTexture(spriteBox.GetTextureKey()), new Rectangle((int)(spriteBox.GetPosition().X + GetPosition().X), (int)(spriteBox.GetPosition().Y + GetPosition().Y), spriteBox.GetWidth(), spriteBox.GetHeight()), spriteBox.GetSourceRectangle(), Color.White);
-                    }
-                }
-            }
-
             // Draw children
             foreach (GameObject d in _children)
             {
@@ -81,9 +78,6 @@ namespace PestControlEngine.Objects
             {
                 d.Update(gameTime, gameInfo);
             }
-
-            // Update animation
-            CurrentAnimation.Update(gameTime);
 
             // Events
             if (new Rectangle(Mouse.GetState().X, Mouse.GetState().Y, 1, 1).Intersects(GetBoundingBox()) && Mouse.GetState().LeftButton == ButtonState.Pressed && previousMouse.LeftButton == ButtonState.Released)
@@ -107,6 +101,11 @@ namespace PestControlEngine.Objects
             previousMouse = Mouse.GetState();
         }
 
+        /// <summary>
+        /// Converts a Dictionary of SpriteJsons to a Dictionary of Sprites.
+        /// </summary>
+        /// <param name="spriteDictionary">The Dictionary of SpriteJsons to convert</param>
+        /// <returns></returns>
         public static Dictionary<string, Sprite> FromJsonSprites(Dictionary<string, SpriteJson> spriteDictionary)
         {
             Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
@@ -121,36 +120,7 @@ namespace PestControlEngine.Objects
 
         public virtual Rectangle GetBoundingBox()
         {
-            if (CurrentAnimation == null || CurrentAnimation.GetCurrentSprite() == null)
-            {
-                return BoundingBox;
-            }
-            else
-            {
-                int lowestX = 0;
-                int lowestY = 0;
-                int highestX = 0;
-                int highestY = 0;
-
-                foreach (KeyValuePair<string, Sprite> pair in FromJsonSprites(CurrentAnimation.GetCurrentSprite()))
-                {
-                    if (pair.Value.GetPosition().X < lowestX)
-                        lowestX = (int)pair.Value.GetPosition().X;
-
-                    if (pair.Value.GetPosition().Y < lowestY)
-                        lowestY = (int)pair.Value.GetPosition().Y;
-
-                    if (pair.Value.GetRectangle().Right > highestX)
-                        highestX = pair.Value.GetRectangle().Right;
-
-                    if (pair.Value.GetRectangle().Bottom > highestY)
-                        highestY = pair.Value.GetRectangle().Bottom;
-                }
-
-                return new Rectangle(lowestX + (int)GetPosition().X, lowestY + (int)GetPosition().Y, highestX - lowestX, highestY - lowestY);
-            }
-
-            
+            return BoundingBox;
         }
 
         public virtual Vector2 GetPosition()
@@ -174,14 +144,6 @@ namespace PestControlEngine.Objects
         public virtual void SetPosition(Vector2 position)
         {
             _Position = position;
-        }
-
-        public virtual Dictionary<string, Sprite> GetSpriteBoxes()
-        {
-            if (CurrentAnimation == null || CurrentAnimation.GetCurrentSprite() == null)
-                return new Dictionary<string, Sprite>();
-
-            return FromJsonSprites(CurrentAnimation.GetCurrentSprite());
         }
 
         public virtual void AddChild(GameObject drawable)

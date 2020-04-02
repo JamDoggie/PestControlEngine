@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using PestControlEngine.Libs.Helpers.Structs;
+using PestControlEngine.Resource;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace PestControlEngine.GUI
 
         private Queue<float> _sampleBuffer = new Queue<float>();
 
-        public TextElement FPSText = new TextElement();
+        public UITextElement FPSText = new UITextElement();
 
         public UIFPSCounter()
         {
@@ -46,6 +47,10 @@ namespace PestControlEngine.GUI
             TotalSeconds += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             FPSText.Text = ((int)AverageFramesPerSecond).ToString() + " FPS";
+
+            Width = (int)ContentLoader.GetFont("engine_font").MeasureString(FPSText.Text).Width;
+            Height = (int)ContentLoader.GetFont("engine_font").MeasureString(FPSText.Text).Height;
+
             base.Update(gameTime, info);
         }
     }

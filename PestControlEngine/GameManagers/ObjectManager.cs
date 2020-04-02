@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using PestControlEngine.Event.Structs;
 using PestControlEngine.GUI.Enum;
 using PestControlEngine.Libs.Helpers.Structs;
 using PestControlEngine.Objects;
@@ -30,6 +31,11 @@ namespace PestControlEngine.GameManagers
         public bool UseVirtualSize { get; set; } = true;
 
         private RenderTarget2D _RenderTarget = null;
+
+        public ObjectManager()
+        {
+            
+        }
 
         /// <summary>
         /// Calls draw methods in all GameObjects. This then repeats with all the GameObject's children down the line.
@@ -88,7 +94,7 @@ namespace PestControlEngine.GameManagers
                         float newWidth = (VirtualViewHeight * aspectRatio);
 
 
-                        Console.WriteLine($"{info.graphicsDevice.PresentationParameters.BackBufferWidth}____{info.graphicsDevice.PresentationParameters.BackBufferHeight}");
+                        //Console.WriteLine($"{info.graphicsDevice.PresentationParameters.BackBufferWidth}____{info.graphicsDevice.PresentationParameters.BackBufferHeight}");
                         VirtualViewWidth = (int)newWidth;
                         break;
                 }
@@ -110,6 +116,11 @@ namespace PestControlEngine.GameManagers
                     CurrentCamera = camera;
                 }
             }
+        }
+
+        public void MouseClickEvent(MouseEventArgs args)
+        {
+
         }
 
         public void SetMatrix(Matrix? matrix)
@@ -181,7 +192,7 @@ namespace PestControlEngine.GameManagers
 
             spriteBatch.Draw(texture, rectangle, new Rectangle(0, 0, 1, 1), color);
         }
-        
+
         /// <summary>
         /// Ends given sprite batch and begins it with the default parameters.
         /// WARNING: sprite batch must already be started. Otherwise it will throw an exception.
@@ -208,6 +219,23 @@ namespace PestControlEngine.GameManagers
 
             spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, CurrentMatrix);
 
+        }
+    }
+
+    public static class ExtendedSpriteBatch
+    {
+        public static void DrawLine(this SpriteBatch spriteBatch, Texture2D texture, Vector2 point1, Vector2 point2, Color color, float thickness = 1f)
+        {
+            var distance = Vector2.Distance(point1, point2);
+            var angle = (float)Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
+            DrawLine(spriteBatch, texture, point1, distance, angle, color, thickness);
+        }
+
+        public static void DrawLine(this SpriteBatch spriteBatch, Texture2D texture, Vector2 point, float length, float angle, Color color, float thickness = 1f)
+        {
+            var origin = new Vector2(0f, 0.5f);
+            var scale = new Vector2(length, thickness);
+            spriteBatch.Draw(texture, point, null, color, angle, origin, scale, SpriteEffects.None, 0);
         }
     }
 }

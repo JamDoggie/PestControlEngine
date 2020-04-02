@@ -1,8 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using PestControlEngine.Event.Structs;
 using PestControlEngine.GUI.Enum;
 using PestControlEngine.Libs.Helpers;
 using PestControlEngine.Libs.Helpers.Structs;
+using PestControlEngine.Mapping;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +31,13 @@ namespace PestControlEngine.GUI
 
         private RenderTarget2D _RenderTarget = null;
 
+        public GUIManager()
+        {
+            
+        }
+
+        
+
         public void LoadScreen(string key, Screen screen)
         {
             _LoadedScreens.Add(key, screen);
@@ -51,7 +60,7 @@ namespace PestControlEngine.GUI
                         float newWidth = (VirtualViewHeight * aspectRatio);
 
 
-                        Console.WriteLine($"{info.graphicsDevice.PresentationParameters.BackBufferWidth}____{info.graphicsDevice.PresentationParameters.BackBufferHeight}");
+                        //Console.WriteLine($"{info.graphicsDevice.PresentationParameters.BackBufferWidth}____{info.graphicsDevice.PresentationParameters.BackBufferHeight}");
                         VirtualViewWidth = (int)newWidth;
                         break;
                 }

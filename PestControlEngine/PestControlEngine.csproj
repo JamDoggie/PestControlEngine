@@ -46,28 +46,38 @@
     <Compile Include="Event\Structs\MouseClickedArgs.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GameManagers\ObjectManager.cs" />
-    <Compile Include="GUI\Button.cs" />
+    <Compile Include="GUI\UIButton.cs" />
     <Compile Include="GUI\Enum\EnumHorizontalAlignment.cs" />
     <Compile Include="GUI\Enum\EnumVerticalAlignment.cs" />
     <Compile Include="GUI\Enum\StretchType.cs" />
-    <Compile Include="GUI\Grid.cs" />
+    <Compile Include="GUI\UIGrid.cs" />
     <Compile Include="GUI\GUIManager.cs" />
     <Compile Include="GUI\Screen.cs" />
-    <Compile Include="GUI\TextElement.cs" />
+    <Compile Include="GUI\UITextElement.cs" />
+    <Compile Include="GUI\UIConsole.cs" />
     <Compile Include="GUI\UIElement.cs" />
     <Compile Include="GUI\UIFPSCounter.cs" />
+    <Compile Include="GUI\UILine.cs" />
     <Compile Include="GUI\UIRectangle.cs" />
+    <Compile Include="GUI\UITextBox.cs" />
     <Compile Include="Libs\Helpers\FileHelpers.cs" />
     <Compile Include="Libs\Helpers\Structs\GameInfo.cs" />
     <Compile Include="Libs\Helpers\Util.cs" />
     <Compile Include="Libs\Localization\Localization.cs" />
+    <Compile Include="Mapping\Enums\PropertyType.cs" />
+    <Compile Include="Mapping\GameObjectInfo.cs" />
+    <Compile Include="Mapping\GameObjectProperty.cs" />
+    <Compile Include="Mapping\ObjectExtract.cs" />
+    <Compile Include="Mapping\ObjectInformationFile.cs" />
     <Compile Include="Objects\GameCamera.cs" />
     <Compile Include="Objects\GameObject.cs" />
+    <Compile Include="Objects\GameObjectAnimated.cs" />
     <Compile Include="Objects\Sprite.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resource\ContentLoader.cs" />
     <Compile Include="Sound\SoundManager.cs" />
+    <Compile Include="Types\RectangleJSON.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Extended, Version=3.7.0.0, Culture=neutral, processorArchitecture=MSIL">

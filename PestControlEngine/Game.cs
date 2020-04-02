@@ -3,11 +3,13 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using PestControlAnimation.Objects;
+using PestControlEngine.Event.Structs;
 using PestControlEngine.GameManagers;
 using PestControlEngine.GUI;
 using PestControlEngine.GUI.Enum;
 using PestControlEngine.Libs.Helpers;
 using PestControlEngine.Libs.Helpers.Structs;
+using PestControlEngine.Mapping;
 using PestControlEngine.Objects;
 using PestControlEngine.Resource;
 using PestControlEngine.Sound;
@@ -44,12 +46,7 @@ namespace PestControlEngine
 
             objManager = new ObjectManager();
 
-            debugScreen = new Screen();
-            fadeTest = new Screen();
-
-            guiManager = new GUIManager();
-            guiManager.LoadScreen("debug_screen", debugScreen);
-            guiManager.LoadScreen("fade_screen", fadeTest);
+            
 
             GameInfo gameInfo = new GameInfo(GraphicsDevice, spriteBatch, objManager, guiManager, GetResolution(), Content, soundManager);
 
@@ -67,7 +64,7 @@ namespace PestControlEngine
             ContentLoader.LoadTexture("Ryu Intro Sheet", Texture2D.FromStream(GraphicsDevice, File.Open("Ryu Intro Sheet.png", FileMode.Open)));
 
             // Test, remove later.
-            GameObject ryuIntro = new GameObject();
+            GameObjectAnimated ryuIntro = new GameObjectAnimated();
             ryuIntro.CurrentAnimation = Animation.ReadAnimationFile("intro_ryu_idle.pcaf");
             ryuIntro.CurrentAnimation.Play();
 
@@ -80,7 +77,7 @@ namespace PestControlEngine
             objManager.GetObjects().Add(MainCamera);
 
             GraphicsDevice.PresentationParameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
-
+            
             base.Initialize();
         }
 
@@ -101,10 +98,23 @@ namespace PestControlEngine
             ContentLoader.LoadShaders(Content);
             ContentLoader.LoadSounds(Content);
 
+            debugScreen = new Screen();
+            fadeTest = new Screen();
 
-            Grid grid = new Grid();
+            guiManager = new GUIManager();
+            guiManager.LoadScreen("debug_screen", debugScreen);
+            guiManager.LoadScreen("fade_screen", fadeTest);
 
-            Button button = new Button(new Vector2(200, 200), 200, 200);
+            UIButton pcoibutton = new UIButton(new Vector2(0, 50), 20, 20);
+            pcoibutton.ButtonTextBlock.Text = "pcoi";
+            pcoibutton.MouseClickedEvent += PCOIButtonClick;
+
+            debugScreen.AddControl(pcoibutton);
+
+
+            UIGrid grid = new UIGrid();
+
+            UIButton button = new UIButton(new Vector2(200, 200), 200, 200);
             button.ButtonTextBlock.Text = "Scale Test";
             button.ScaleToText = false;
 
@@ -119,9 +129,9 @@ namespace PestControlEngine
             debugScreen.AddControl(fpsCounter);
 
             // TEST SCREEN FOR FADING
-            Grid grid2 = new Grid();
+            UIGrid grid2 = new UIGrid();
 
-            Button button2 = new Button(new Vector2(200, 200), 200, 200);
+            UIButton button2 = new UIButton(new Vector2(200, 200), 200, 200);
             button2.ButtonTextBlock.Text = "Faded";
             button2.ScaleToText = false;
 
@@ -131,6 +141,14 @@ namespace PestControlEngine
 
             // Set default screen
             guiManager.SetScreen("debug_screen");
+
+
+        }
+
+        public void PCOIButtonClick(MouseEventArgs args)
+        {
+            // Extract PCOI
+            ObjectExtract.ExtractInfo("ratcontrol.pcoi");
         }
 
         /// <summary>

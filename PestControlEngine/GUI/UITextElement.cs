@@ -11,20 +11,33 @@ using System.Threading.Tasks;
 
 namespace PestControlEngine.GUI
 {
-    public class TextElement : UIElement
+    public class UITextElement : UIElement
     {
         public string Text { get; set; }
 
         public Color TextColor { get; set; } = Color.White;
 
+        public BitmapFont Font { get; set; }
+
         private RasterizerState _RasterizerState = new RasterizerState() { ScissorTestEnable = true };
+
+        public UITextElement()
+        {
+            BitmapFont font = ContentLoader.GetFont("engine_font");
+            Font = font;
+        }
+
+        public UITextElement(BitmapFont font)
+        {
+            Font = font;
+        }
 
         public override void Draw(GameTime gameTime, GraphicsDevice device, SpriteBatch spriteBatch, GameInfo info)
         {
-            if (Parent == null)
+            if (Parent != null)
             {
-                // Little explanation, this draws the text so that monogame doesn't draw it outside it's parent element. 
-                //This unfortunately does restart the spritebatch which(i believe) can effect performance even if it's small.
+                // This draws the text so that monogame doesn't draw it outside it's parent element. 
+                // This does introduce an extra draw call.
 
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, _RasterizerState);
@@ -36,17 +49,26 @@ namespace PestControlEngine.GUI
                 if (Parent != null)
                     spriteBatch.GraphicsDevice.ScissorRectangle = Parent.GetBoundingBox();
 
-                spriteBatch.DrawString(ContentLoader.GetFont("engine_font"), Text, RenderPosition, TextColor);
+                // Dynamically scale text to the parent so it fits within the parent.
+                if (DynamicallyScale)
+                {
+                    float newScale = (float)Parent.Height / Font.MeasureString(Text).Height;
+
+                    spriteBatch.DrawString(Font, Text, RenderPosition, TextColor, 0, new Vector2(), new Vector2(0.6f, 0.6f), SpriteEffects.None, 0);
+                }
+                else
+                {
+                    spriteBatch.DrawString(Font, Text, RenderPosition, TextColor, 0, new Vector2(), new Vector2(1f, 1f), SpriteEffects.None, 0);
+                }
 
                 // Restore scissor rectangle
                 spriteBatch.GraphicsDevice.ScissorRectangle = currentRect;
 
-                spriteBatch.End();
-                spriteBatch.Begin();
+                info.guiManager.SwitchToDefaultSpriteBatch(spriteBatch);
             }
             else
             {
-                spriteBatch.DrawString(ContentLoader.GetFont("engine_font"), Text, RenderPosition, TextColor);
+                spriteBatch.DrawString(Font, Text, RenderPosition, TextColor, 0, new Vector2(), new Vector2(1f, 1f), SpriteEffects.None, 0);
             }
 
             base.Draw(gameTime, device, spriteBatch, info);
@@ -54,8 +76,8 @@ namespace PestControlEngine.GUI
 
         public override void Update(GameTime gameTime, GameInfo info)
         {
-            Width = (int)ContentLoader.GetFont("engine_font").MeasureString(Text).Width;
-            Height = (int)ContentLoader.GetFont("engine_font").MeasureString(Text).Height;
+            Width = (int)Font.MeasureString(Text).Width;
+            Height = (int)Font.MeasureString(Text).Height;
 
             base.Update(gameTime, info);
         }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace PestControlEngine.GUI
 {
-    public class Grid : UIElement
+    public class UIGrid : UIElement
     {
         public List<GridCell> Cells = new List<GridCell>();
 

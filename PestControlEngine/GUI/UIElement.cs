@@ -83,6 +83,8 @@ namespace PestControlEngine.GUI
                     case EnumHorizontalAlignment.RIGHT:
                         Position.X = (Parent.Width) - Width;
                         break;
+                    default:
+                        break;
                 }
 
                 switch (VerticalAlignment)
@@ -95,6 +97,8 @@ namespace PestControlEngine.GUI
                         break;
                     case EnumVerticalAlignment.BOTTOM:
                         Position.Y = Parent.Height - Height;
+                        break;
+                    default:
                         break;
                 }
             }
@@ -148,7 +152,7 @@ namespace PestControlEngine.GUI
                 });
             }
 
-            if (new Rectangle(Mouse.GetState().X, Mouse.GetState().Y, 1, 1).Intersects(RenderBox))
+            if (Mouse.GetState().Position != _previousMouse.Position)
             {
                 MouseMovedEvent.Invoke(new MouseEventArgs()
                 {
@@ -178,18 +182,18 @@ namespace PestControlEngine.GUI
                 });
             }
 
-            foreach (UIElement element in _Children)
-            {
-                element.Update(gameTime, info);
-            }
-
             if (Parent != null && Parent.Position != null)
             {
-                RenderPosition = Position + Parent.Position;
+                RenderPosition = Position + Parent.RenderPosition;
             }
             else
             {
                 RenderPosition = Position;
+            }
+
+            foreach (UIElement element in _Children)
+            {
+                element.Update(gameTime, info);
             }
 
             _previousMouse = Mouse.GetState();
