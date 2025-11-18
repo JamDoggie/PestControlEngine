@@ -1,8 +1,10 @@
-Low-Level-If-You-Want game engine built off Monogame, made in C#.
+Simple 2D game engine built off Monogame, made in C#.
 
 Current Toolset:
-The actual game engine of course(This repository)
+The engine (this repository)
 
-Pest Control Animator(Used for creating animation files used in engine to play animations): https://github.com/JamDoggie/PestControlAnimator
+Pest Control Animator (used for creating animation files used in engine to play animations): https://github.com/JamDoggie/PestControlAnimator
 
-Pest Control Mapper(Used for map/level creation): https://github.com/JamDoggie/PestControlMapper
+Pest Control Mapper (used for map/level creation): https://github.com/JamDoggie/PestControlMapper
+
+This hasn't been touched in a long time, but it's still fun to look around the source code.
